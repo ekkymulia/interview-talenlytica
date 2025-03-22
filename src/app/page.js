@@ -122,6 +122,8 @@ export default function Home() {
 
       <div className="pt-5">
         Ekky Mulia Lasardi - Interview Talenlytica
+        <br/>
+        https://github.com/ekkymulia/interview-talenlytica
       </div>
     </div>
   );
