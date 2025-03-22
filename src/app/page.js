@@ -1,103 +1,128 @@
-import Image from "next/image";
+'use client'
+import React, { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [penilaian, setPenilaian] = useState(
+    Array.from({ length: 10 }).reduce((acc, _, index) => {
+      acc[`mahasiswa_${index + 1}`] = {
+        aspek_1: 1,
+        aspek_2: 1,
+        aspek_3: 1,
+        aspek_4: 1,
+      };
+      return acc;
+    }, {})
+  );
+  const [showResult, setShowResult] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleChange = (mahasiswa, aspek, value) => {
+    setPenilaian((prev) => ({
+      ...prev,
+      [mahasiswa]: {
+        ...prev[mahasiswa],
+        [aspek]: Number(value),
+      },
+    }));
+  };
+
+  const transformData = () => {
+    const formattedData = {
+      aspek_penilaian_1: {},
+      aspek_penilaian_2: {},
+      aspek_penilaian_3: {},
+      aspek_penilaian_4: {},
+    };
+
+    Object.entries(penilaian).forEach(([mahasiswa, aspek]) => {
+      Object.keys(aspek).forEach((key, index) => {
+        formattedData[`aspek_penilaian_${index + 1}`][mahasiswa] = aspek[key];
+      });
+    });
+
+    return formattedData;
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-items-center min-h-screen p-8 pb-20 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      <h1 className="text-2xl">Aspek Penilaian Mahasiswa</h1>
+      
+      <br/>
+
+      <table className="w-full bg-white">
+        <thead>
+          <tr className="">
+            <th className="py-4"></th>
+            <th className="py-4 text-center text-gray-600 text-sm font-medium">Aspek penilaian 1</th>
+            <th className="py-4 text-center text-gray-600 text-sm font-medium">Aspek penilaian 2</th>
+            <th className="py-4 text-center text-gray-600 text-sm font-medium">Aspek penilaian 3</th>
+            <th className="py-4 text-center text-gray-600 text-sm font-medium">Aspek penilaian 4</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: 10 }).map((_, index) => {
+            const mahasiswaKey = `mahasiswa_${index + 1}`;
+            return (
+              <tr key={index} className="border border-gray-200 ">
+                <td className="px-4 py-3">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 mr-3 bg-gray-200 rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span className="text-gray-700">Mahasiswa {index + 1}</span>
+                  </div>
+                </td>
+                
+                {["aspek_1", "aspek_2", "aspek_3", "aspek_4"].map((aspek, aspekIndex) => (
+                  <td key={aspekIndex} className="text-center py-2">
+                    <div className="relative inline-block w-4/5">
+                      <select
+                        value={penilaian[mahasiswaKey][aspek]}
+                        onChange={(e) => handleChange(mahasiswaKey, aspek, e.target.value)}
+                        className="block w-full appearance-none bg-white border border-gray-200 rounded px-4 py-2 pr-8 leading-tight focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                      >
+                        {Array.from({ length: 10 }).map((_, optionIndex) => (
+                          <option key={optionIndex} value={optionIndex + 1}>
+                            {optionIndex + 1}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      <div className="w-full flex justify-end mt-4">
+        <button 
+          className="bg-black text-white px-4 py-2 rounded" 
+          onClick={() => setShowResult(true)}
+        >
+          Submit
+        </button>
+      </div>
+
+      {showResult && (
+        <div className="mt-6 p-4 border border-gray-300 rounded w-full">
+          <h2 className="text-xl font-bold">Hasil Penilaian:</h2>
+          <pre className="bg-gray-100 p-2 rounded text-sm overflow-x-auto">
+            {JSON.stringify(transformData(), null, 2)}
+          </pre>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
+
+      <div className="pt-5">
+        Ekky Mulia Lasardi - Interview Talenlytica
+      </div>
     </div>
   );
 }
